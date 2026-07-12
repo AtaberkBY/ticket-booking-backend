@@ -18,4 +18,12 @@ export class UsersService {
         const newUser = this.userRepository.create(userData);
         return this.userRepository.save(newUser);
     }
+
+    async updateRefreshToken ( userId: string, token: string | null): Promise<void> {
+        await this.userRepository.update(userId, { refreshToken: token || undefined});
+    }
+
+    async findById(id: string): Promise <User | null> {
+        return this.userRepository.findOne({where: {id}});
+    }
 }

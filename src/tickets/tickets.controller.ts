@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -16,5 +16,16 @@ export class TicketsController {
     @Roles('admin')
     async create(@Body() createTicketDto: CreateTicketDto) {
         return this.ticketsService.create(createTicketDto);
+    }
+
+    @Get()
+    async findAll(@Query('available') available?: string) {
+        const onlyAvailable = available === 'true';
+        return this.ticketsService.findAll(onlyAvailable);
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id:string) {
+        return this.ticketsService.findOne(id);
     }
 }

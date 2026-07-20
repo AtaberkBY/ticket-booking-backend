@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, MoreThan, FindManyOptions } from "typeorm";
 import { Ticket } from "./entities/ticket.entity";
 import { CreateTicketDto } from "./dto/create-ticket.dto";
+import { UpdateTicketDto } from "./dto/update-ticket.dto";
 
 @Injectable()
 export class TicketsService {
@@ -24,6 +25,32 @@ export class TicketsService {
             eventDate,
         });
         return this.ticketRepository.save(newTicket);
+    }
+
+    async update(id: string, updateTicketDto: UpdateTicketDto): Promise<Ticket> {
+        const ticket = await this.findOne(id);
+
+        if(updateTicketDto.eventDate) {
+            const eventDate = new Date(updateTicketDto.eventDate);
+            if(eventDate < new Date()){
+                throw new BadRequestException('Updated event date cannot be in the past.');
+            }
+            ticket.eventDate = eventDate;
+        }
+
+        Object.assign(ticket, updateTicketDto);
+        return this.ticketRepository.save(ticket);
+    }
+
+    async remove(id: string): Promise<{message: string}> {
+        const ticket = await this.findOne(id);
+        if(!ticket){
+            throw new NotFoundException(`There is no ticket with the id:${id}`);
+        }
+
+        await this.ticketRepository.remove(ticket);
+        return {message:`Ticket with the id:${id} has been removed.`}
+
     }
 
     async findAll(onlyAvailable: boolean = false): Promise<Ticket[]> {

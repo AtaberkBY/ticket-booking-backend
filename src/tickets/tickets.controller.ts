@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query, Proppatch, Delete, UseGuards, Patch } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -17,6 +18,21 @@ export class TicketsController {
     async create(@Body() createTicketDto: CreateTicketDto) {
         return this.ticketsService.create(createTicketDto);
     }
+
+    @Patch(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('admin')
+    async update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
+        return this.ticketsService.update(id, updateTicketDto);
+    }
+
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('admin')
+    async remove(@Param('id') id: string){
+        return this.ticketsService.remove(id);
+    }
+
 
     @Get()
     async findAll(@Query('available') available?: string) {

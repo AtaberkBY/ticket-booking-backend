@@ -30,15 +30,27 @@ export class TicketsService {
     async update(id: string, updateTicketDto: UpdateTicketDto): Promise<Ticket> {
         const ticket = await this.findOne(id);
 
-        if(updateTicketDto.eventDate) {
-            const eventDate = new Date(updateTicketDto.eventDate);
-            if(eventDate < new Date()){
-                throw new BadRequestException('Updated event date cannot be in the past.');
+        const allowedFields = ['title', 'description', 'price', 'totalStock', 'eventDate'] as const;
+
+        for (const field of allowedFields) {
+            const value = updateTicketDto[field];
+
+            if (value === undefined || value === null || value === '') {
+                continue;
             }
-            ticket.eventDate = eventDate;
+
+            if (field === 'eventDate') {
+                const eventDate = new Date(value as string);
+                if (eventDate < new Date()) {
+                    throw new BadRequestException('Updated event date cannot be in the past.');
+                }
+                ticket.eventDate = eventDate;
+                continue;
+            }
+
+            ticket[field] = value as never;
         }
 
-        Object.assign(ticket, updateTicketDto);
         return this.ticketRepository.save(ticket);
     }
 

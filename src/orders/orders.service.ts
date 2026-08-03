@@ -5,6 +5,8 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Ticket } from '../tickets/entities/ticket.entity';
 import { User } from '../users/entities/user.entity';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { LessThan } from 'typeorm';
 
 @Injectable()
 export class OrdersService {
@@ -123,4 +125,34 @@ export class OrdersService {
             order: { createdAt: 'DESC'},
         });
     }
-}
+
+    @Cron(CronExpression.EVERY_MINUTE)
+    async cancelExpiredOrders(){
+        const TEN_MINUTES_AGO = new Date(Date.now() - 10 * 60 * 1000);
+
+        const expiredOrders = await this.orderRepository.find({
+            where: {
+                status: OrderStatus.PENDING,
+                createdAt: LessThan(TEN_MINUTES_AGO),
+            },
+            relations: {
+                ticket: true,
+            },
+        });
+
+        if(expiredOrders.length === 0){
+            return;
+        }
+        for(const order of expiredOrders){
+            await this.dataSource.transaction(async (manager) => {
+                const ticket = order.ticket;
+
+                ticket.reservedStock -= order.quantity;
+                await manager.save(ticket);
+
+                order.status = OrderStatus.CANCELLED;
+                await manager.save(order);
+            });
+        }
+        console.log(`[CRON] Timeout: Cancelled ${expiredOrders.length} expired orders.`);
+    }}

@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: topsecretpassword123
       POSTGRES_DB: ticket_booking
     ports:
-      - "5433:5432"
+      - "0.0.0.0:5433:5432"
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
     restart: unless-stopped

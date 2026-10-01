@@ -38,8 +38,8 @@ A NestJS ticket booking backend with PostgreSQL persistence, JWT authentication,
 - User registration and login
 - JWT access tokens with refresh token issuance
 - Role-based access control for admin ticket management
-- Ticket creation, update, deletion, listing, and retrieval
-- Order creation, confirmation, cancellation, and user order history
+- Ticket creation, update, deletion, listing and retrieval
+- Order creation, confirmation, cancellation and user order history
 - Pessimistic stock locking during order creation
 - Background job that cancels pending orders older than 10 minutes
 - Admin account seeding via environment variables

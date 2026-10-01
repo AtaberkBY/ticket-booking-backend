@@ -94,11 +94,11 @@ metadata:
   name: nestjs-ticket-secret
 type: Opaque
 stringData:
-  DB_USER: "ticket_user"
-  DB_PASSWORD: "topsecretpassword123"
-  JWT_SECRET_KEY: "ticket_booking_wohoo"
-  ADMIN_EMAIL: "ataberk@fenasalbiletler.com"
-  ADMIN_PASSWORD: "fenasal123biletler"
+  DB_USER: $DB_USER
+  DB_PASSWORD: $DB_PASSWORD
+  JWT_SECRET_KEY: $JWT_SECRET_KEY
+  ADMIN_EMAIL: $ADMIN_EMAIL
+  ADMIN_PASSWORD: $ADMIN_PASSWORD
 ---
 apiVersion: apps/v1
 kind: Deployment

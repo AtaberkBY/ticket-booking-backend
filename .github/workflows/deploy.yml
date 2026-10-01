@@ -13,5 +13,11 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Apply Kubernetes Manifests
+      env:
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       run: |
-        kubectl apply -f k8s-manifest.yaml
+        envsubst < k8s-manifest.yaml | kubectl apply -f -
